@@ -15,26 +15,7 @@ export default function SoftwareResultsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        if (!id) {
-          setError("No comparison ID provided")
-          setLoading(false)
-          return
-        }
-"use client"
 
-import { useSearchParams, useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
-
-export default function SoftwareResultsPage() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const id = searchParams.get("id")
-  const [results, setResults] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -146,7 +127,8 @@ export default function SoftwareResultsPage() {
 
   const stats = results.statistics
   const container = { minHeight: "100vh", background: "linear-gradient(180deg,#0f1724,#111827)", color: "#e6eef8" }
-  const header = { borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "20px 16px", position: "sticky", top: 0, zIndex: 40 }
+  // Make header flow with page (not fixed/sticky) so it doesn't stay pinned at the top
+  const header = { borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "20px 16px" }
   const mainStyle = { maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }
   const card = { background: "rgba(17,24,39,0.6)", borderRadius: 8, padding: 20, border: "1px solid rgba(255,255,255,0.04)" }
 
@@ -228,133 +210,6 @@ export default function SoftwareResultsPage() {
         <div style={{ marginTop: 12, display: "flex", gap: 8, justifyContent: "center", paddingBottom: 24 }}>
           <button onClick={() => router.push("/compare/software")} style={{ padding: "10px 14px", borderRadius: 6, border: "none", background: "linear-gradient(90deg,#2563eb,#06b6d4)", color: "white" }}>New Comparison</button>
           <button onClick={() => router.push("/")} style={{ padding: "10px 14px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.06)", background: "transparent", color: "#e6eef8" }}>Home</button>
-        </div>
-      </main>
-    </div>
-  )
-}
-                <p className="text-sm text-slate-400 mb-3">
-                  Skip re-testing {(stats.unchanged_percentage || 0).toFixed(1)}% of unchanged code. This saves
-                  approximately{" "}
-                  <span className="text-green-300 font-semibold">{(stats.unchanged_percentage || 0).toFixed(1)}%</span>{" "}
-                  of your testing time.
-                </p>
-                <p className="text-xs text-slate-500">
-                  {stats.unchanged_files_count} unchanged files are safe to skip in regression testing.
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-900/5 border-yellow-700/50 p-8 hover:border-yellow-500/30 transition-colors">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <AlertCircle className="h-6 w-6 text-yellow-400 mt-1" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-yellow-400 mb-3">Priority Testing</h3>
-                <p className="text-sm text-slate-400 mb-3">
-                  Focus {(stats.modified_percentage || 0).toFixed(1)}% of your testing resources on modified code.
-                  Allocate testers to thoroughly test these{" "}
-                  <span className="text-yellow-300 font-semibold">{stats.modified_files_count} files</span>.
-                </p>
-                <p className="text-xs text-slate-500">These files require comprehensive regression testing.</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Modified Files List */}
-        {results.modified_files && results.modified_files.length > 0 && (
-          <Card className="bg-slate-800/50 border-slate-700 p-10 mb-12">
-            <h2 className="text-2xl font-bold text-white mb-8">Modified Files Details</h2>
-
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-4">
-              {results.modified_files.map((file: string, idx: number) => {
-                const changes = results.detailed_changes?.[file] || {}
-                const similarity = changes.similarity || 0
-
-                return (
-                  <div
-                    key={idx}
-                    className="bg-slate-700/30 p-5 rounded-lg border border-slate-600 hover:border-slate-500 transition-all hover:bg-slate-700/50"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-mono text-sm text-blue-300 truncate mb-2">{file}</div>
-                        <div className="flex gap-4 flex-wrap text-xs text-slate-400">
-                          <span>
-                            Similarity:{" "}
-                            <span
-                              className={`font-semibold ${similarity >= 90 ? "text-green-400" : similarity >= 70 ? "text-yellow-400" : "text-red-400"}`}
-                            >
-                              {similarity.toFixed(1)}%
-                            </span>
-                          </span>
-                          <span>
-                            <span className="text-green-400">+{changes.added_lines || 0}</span> lines
-                          </span>
-                          <span>
-                            <span className="text-red-400">-{changes.deleted_lines || 0}</span> lines
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <div className="w-20 h-1.5 bg-slate-600 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              similarity >= 90 ? "bg-green-500" : similarity >= 70 ? "bg-yellow-500" : "bg-red-500"
-                            }`}
-                            style={{ width: `${similarity}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </Card>
-        )}
-
-        {/* Download Reports */}
-        <Card className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border-blue-700/50 p-10 mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4">Export Results</h2>
-          <p className="text-slate-400 mb-8">
-            Download your analysis results in multiple formats for sharing and documentation
-          </p>
-
-          <div className="flex flex-wrap gap-4">
-            <Button onClick={downloadMarkdown} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
-              <FileText className="h-4 w-4 mr-2" />
-              Download Markdown
-            </Button>
-            <Button onClick={downloadJSON} className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3">
-              <FileJson className="h-4 w-4 mr-2" />
-              Download JSON
-            </Button>
-            <Button onClick={downloadCSV} className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3">
-              <Download className="h-4 w-4 mr-2" />
-              Download CSV
-            </Button>
-          </div>
-        </Card>
-
-        {/* Footer Actions */}
-        <div className="mt-12 flex gap-4 justify-center pb-8">
-          <Button
-            onClick={() => router.push("/compare/software")}
-            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3"
-          >
-            New Comparison
-          </Button>
-          <Button
-            onClick={() => router.push("/")}
-            variant="outline"
-            className="border-slate-600 text-slate-300 hover:bg-slate-700 px-8 py-3"
-          >
-            Home
-          </Button>
         </div>
       </main>
     </div>
