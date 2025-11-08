@@ -23,6 +23,27 @@ export default function SoftwareResultsPage() {
           setLoading(false)
           return
         }
+"use client"
+
+import { useSearchParams, useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+
+export default function SoftwareResultsPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const id = searchParams.get("id")
+  const [results, setResults] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        if (!id) {
+          setError("No comparison ID provided")
+          setLoading(false)
+          return
+        }
 
         const response = await fetch(`/api/results/${id}`)
 
@@ -49,21 +70,8 @@ export default function SoftwareResultsPage() {
   const downloadMarkdown = () => {
     if (!results) return
 
-    const stats = results.statistics
-    const markdown = `# Version Comparison Report
-
-## Summary
-- **Total Files:** ${stats.total_files}
-- **Unchanged:** ${stats.unchanged_files_count} (${(stats.unchanged_percentage || 0).toFixed(1)}%)
-- **Modified:** ${stats.modified_files_count} (${(stats.modified_percentage || 0).toFixed(1)}%)
-- **Added:** ${stats.added_files_count} (${(stats.added_percentage || 0).toFixed(1)}%)
-- **Deleted:** ${stats.deleted_files_count} (${(stats.deleted_percentage || 0).toFixed(1)}%)
-- **Average Similarity:** ${(stats.average_similarity || 0).toFixed(1)}%
-
-## Testing Recommendations
-- Skip testing ${(stats.unchanged_percentage || 0).toFixed(1)}% of unchanged code
-- Focus on ${(stats.modified_percentage || 0).toFixed(1)}% of modified code
-`
+    const stats = results.statistics || {}
+    const markdown = `# Version Comparison Report\n\n## Summary\n- **Total Files:** ${stats.total_files || 0}\n- **Unchanged:** ${stats.unchanged_files_count || 0} (${(stats.unchanged_percentage || 0).toFixed(1)}%)\n- **Modified:** ${stats.modified_files_count || 0} (${(stats.modified_percentage || 0).toFixed(1)}%)\n- **Added:** ${stats.added_files_count || 0} (${(stats.added_percentage || 0).toFixed(1)}%)\n- **Deleted:** ${stats.deleted_files_count || 0} (${(stats.deleted_percentage || 0).toFixed(1)}%)\n- **Average Similarity:** ${(stats.average_similarity || 0).toFixed(1)}%\n\n## Testing Recommendations\n- Skip testing ${(stats.unchanged_percentage || 0).toFixed(1)}% of unchanged code\n- Focus on ${(stats.modified_percentage || 0).toFixed(1)}% of modified code\n`
 
     const blob = new Blob([markdown], { type: "text/markdown" })
     const url = window.URL.createObjectURL(blob)
@@ -94,7 +102,7 @@ export default function SoftwareResultsPage() {
     })
 
     results.modified_files?.forEach((file: string) => {
-      const details = results.detailed_changes[file] || {}
+      const details = results.detailed_changes?.[file] || {}
       csv += `"${file}",Modified,${(details.similarity || 0).toFixed(1)},${details.added_lines || 0},${details.deleted_lines || 0}\n`
     })
 
@@ -116,12 +124,10 @@ export default function SoftwareResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin mb-4">
-            <div className="h-12 w-12 rounded-full border-4 border-slate-700 border-t-cyan-400" />
-          </div>
-          <p className="text-white text-lg">Loading analysis results...</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#0f1724,#111827)", color: "#e6eef8" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, borderRadius: 24, border: "4px solid rgba(148,163,184,0.1)", borderTopColor: "#06b6d4", margin: "0 auto 12px" }} />
+          <p style={{ fontSize: 16 }}>Loading analysis results...</p>
         </div>
       </div>
     )
@@ -129,172 +135,104 @@ export default function SoftwareResultsPage() {
 
   if (error || !results || !results.statistics) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <Card className="bg-slate-800/50 border-red-500/50 p-8 text-center max-w-md">
-          <p className="text-red-400 mb-4">{error || "Failed to load analysis results"}</p>
-          <Button onClick={() => router.push("/")}>Go Back Home</Button>
-        </Card>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#0f1724,#111827)", color: "#e6eef8" }}>
+        <div style={{ maxWidth: 520, padding: 20, background: "rgba(17,24,39,0.7)", borderRadius: 8, border: "1px solid rgba(255,0,0,0.06)", textAlign: "center" }}>
+          <p style={{ color: "#fca5a5", marginBottom: 12 }}>{error || "Failed to load analysis results"}</p>
+          <button style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.06)", background: "transparent", color: "#e6eef8", cursor: "pointer" }} onClick={() => router.push("/")}>Go Back Home</button>
+        </div>
       </div>
     )
   }
 
   const stats = results.statistics
+  const container = { minHeight: "100vh", background: "linear-gradient(180deg,#0f1724,#111827)", color: "#e6eef8" }
+  const header = { borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "20px 16px", position: "sticky", top: 0, zIndex: 40 }
+  const mainStyle = { maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }
+  const card = { background: "rgba(17,24,39,0.6)", borderRadius: 8, padding: 20, border: "1px solid rgba(255,255,255,0.04)" }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur sticky top-0 z-40">
-        <div className="mx-auto max-w-6xl px-6 py-8">
-          <button
-            onClick={() => router.push("/")}
-            className="mb-4 flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </button>
-          <h1 className="text-3xl font-bold text-white text-center">Comparison Results</h1>
-          <p className="mt-3 text-slate-400 text-center">
-            Detailed analysis of version differences and testing recommendations
-          </p>
+    <div style={container}>
+      <header style={header}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#cbd5e1", cursor: "pointer", marginBottom: 8 }}>Back to Home</button>
+          <h1 style={{ textAlign: "center", margin: 0, fontSize: 28 }}>Comparison Results</h1>
+          <p style={{ textAlign: "center", marginTop: 6, color: "#9aa7b8" }}>Detailed analysis of version differences and testing recommendations</p>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-16">
-        {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="bg-gradient-to-br from-slate-800/50 to-slate-700/50 border-slate-700 p-8 hover:border-blue-500/30 transition-colors">
-            <div className="text-sm font-medium text-slate-400 mb-3">Total Files</div>
-            <div className="text-4xl font-bold text-white mb-2">{stats.total_files || 0}</div>
-            <div className="text-xs text-slate-500">Files analyzed</div>
-          </Card>
+      <main style={mainStyle}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12, marginBottom: 16 }}>
+          <div style={card}>
+            <div style={{ color: "#9aa7b8", marginBottom: 6 }}>Total Files</div>
+            <div style={{ fontSize: 32, fontWeight: 700 }}>{stats.total_files || 0}</div>
+            <div style={{ fontSize: 12, color: "#9aa7b8" }}>Files analyzed</div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-green-900/20 to-green-800/20 border-green-700/50 p-8 hover:border-green-500/30 transition-colors">
-            <div className="text-sm font-medium text-green-400 mb-3">Unchanged</div>
-            <div className="text-4xl font-bold text-green-300 mb-2">
-              {(stats.unchanged_percentage || 0).toFixed(1)}%
-            </div>
-            <div className="text-xs text-green-400/60">{stats.unchanged_files_count || 0} files</div>
-          </Card>
+          <div style={{ ...card, background: "rgba(4,120,87,0.06)" }}>
+            <div style={{ color: "#86efac", marginBottom: 6 }}>Unchanged</div>
+            <div style={{ fontSize: 28, fontWeight: 700 }}>{(stats.unchanged_percentage || 0).toFixed(1)}%</div>
+            <div style={{ fontSize: 12, color: "#9aa7b8" }}>{stats.unchanged_files_count || 0} files</div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 border-yellow-700/50 p-8 hover:border-yellow-500/30 transition-colors">
-            <div className="text-sm font-medium text-yellow-400 mb-3">Modified</div>
-            <div className="text-4xl font-bold text-yellow-300 mb-2">
-              {(stats.modified_percentage || 0).toFixed(1)}%
-            </div>
-            <div className="text-xs text-yellow-400/60">{stats.modified_files_count} files</div>
-          </Card>
+          <div style={{ ...card, background: "rgba(234,179,8,0.06)" }}>
+            <div style={{ color: "#facc15", marginBottom: 6 }}>Modified</div>
+            <div style={{ fontSize: 28, fontWeight: 700 }}>{(stats.modified_percentage || 0).toFixed(1)}%</div>
+            <div style={{ fontSize: 12, color: "#9aa7b8" }}>{stats.modified_files_count || 0} files</div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/20 border-blue-700/50 p-8 hover:border-blue-500/30 transition-colors">
-            <div className="text-sm font-medium text-blue-400 mb-3">Avg Similarity</div>
-            <div className="text-4xl font-bold text-blue-300 mb-2">{(stats.average_similarity || 0).toFixed(1)}%</div>
-            <div className="text-xs text-blue-400/60">Code similarity</div>
-          </Card>
+          <div style={{ ...card, background: "rgba(59,130,246,0.06)" }}>
+            <div style={{ color: "#60a5fa", marginBottom: 6 }}>Avg Similarity</div>
+            <div style={{ fontSize: 28, fontWeight: 700 }}>{(stats.average_similarity || 0).toFixed(1)}%</div>
+            <div style={{ fontSize: 12, color: "#9aa7b8" }}>Code similarity</div>
+          </div>
         </div>
 
-        {/* Detailed Breakdown */}
-        <Card className="bg-slate-800/50 border-slate-700 p-10 mb-12">
-          <h2 className="text-2xl font-bold text-white mb-10">File Status Breakdown</h2>
+        <div style={{ ...card, marginBottom: 16 }}>
+          <h2 style={{ marginTop: 0 }}>File Status Breakdown</h2>
+          <p style={{ color: "#cbd5e1" }}>A concise breakdown of unchanged, modified, added and deleted files.</p>
+          {/* A more detailed breakdown can be re-added here using results.* arrays if needed */}
+        </div>
 
-          <div className="space-y-8">
-            {/* Unchanged Files */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span className="text-slate-300 font-semibold">Unchanged Files (Skip Testing)</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-green-400 font-bold text-lg">
-                    {(stats.unchanged_percentage || 0).toFixed(1)}%
-                  </span>
-                  <span className="text-slate-500 text-sm">{stats.unchanged_files_count} files</span>
-                </div>
-              </div>
-              <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
-                  style={{ width: `${stats.unchanged_percentage || 0}%` }}
-                />
-              </div>
-              <p className="text-sm text-slate-400">These files haven't changed and don't need re-testing</p>
-            </div>
-
-            {/* Modified Files */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="h-5 w-5 text-yellow-400" />
-                  <span className="text-slate-300 font-semibold">Modified Files (Focus Testing)</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-yellow-400 font-bold text-lg">
-                    {(stats.modified_percentage || 0).toFixed(1)}%
-                  </span>
-                  <span className="text-slate-500 text-sm">{stats.modified_files_count} files</span>
-                </div>
-              </div>
-              <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-yellow-500 to-yellow-600 transition-all duration-500"
-                  style={{ width: `${stats.modified_percentage || 0}%` }}
-                />
-              </div>
-              <p className="text-sm text-slate-400">Focus your testing efforts on these modified files</p>
-            </div>
-
-            {/* Added Files */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Plus className="h-5 w-5 text-blue-400" />
-                  <span className="text-slate-300 font-semibold">Added Files (New Tests)</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-blue-400 font-bold text-lg">{(stats.added_percentage || 0).toFixed(1)}%</span>
-                  <span className="text-slate-500 text-sm">{stats.added_files_count} files</span>
-                </div>
-              </div>
-              <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
-                  style={{ width: `${stats.added_percentage || 0}%` }}
-                />
-              </div>
-              <p className="text-sm text-slate-400">Create new test cases for these added files</p>
-            </div>
-
-            {/* Deleted Files */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Trash2 className="h-5 w-5 text-red-400" />
-                  <span className="text-slate-300 font-semibold">Deleted Files (Remove Tests)</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-red-400 font-bold text-lg">{(stats.deleted_percentage || 0).toFixed(1)}%</span>
-                  <span className="text-slate-500 text-sm">{stats.deleted_files_count} files</span>
-                </div>
-              </div>
-              <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500"
-                  style={{ width: `${stats.deleted_percentage || 0}%` }}
-                />
-              </div>
-              <p className="text-sm text-slate-400">Remove test cases for these deleted files</p>
-            </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ ...card }}>
+            <h3 style={{ marginTop: 0 }}>Testing Recommendations</h3>
+            <p style={{ color: "#cbd5e1" }}>Skip testing {(stats.unchanged_percentage || 0).toFixed(1)}% of unchanged code. Focus on {(stats.modified_percentage || 0).toFixed(1)}% of modified code.</p>
           </div>
-        </Card>
+          <div style={{ ...card }}>
+            <h3 style={{ marginTop: 0 }}>Risk Summary</h3>
+            <p style={{ color: "#cbd5e1" }}>Files added: {stats.added_files_count || 0} • Files deleted: {stats.deleted_files_count || 0}</p>
+          </div>
+        </div>
 
-        {/* Testing Recommendations */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <Card className="bg-gradient-to-br from-green-900/20 to-green-900/5 border-green-700/50 p-8 hover:border-green-500/30 transition-colors">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <CheckCircle2 className="h-6 w-6 text-green-400 mt-1" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-green-400 mb-3">Testing Optimization</h3>
+        {results.modified_files && results.modified_files.length > 0 && (
+          <div style={{ ...card, marginBottom: 16 }}>
+            <h3 style={{ marginTop: 0 }}>Modified Files</h3>
+            <ul style={{ color: "#cbd5e1" }}>
+              {results.modified_files.map((f: string) => (
+                <li key={f} style={{ padding: "6px 0" }}>{f}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div style={{ ...card, marginBottom: 16 }}>
+          <h2 style={{ marginTop: 0 }}>Export Results</h2>
+          <p style={{ color: "#9aa7b8" }}>Download your analysis results in multiple formats for sharing and documentation</p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+            <button onClick={downloadMarkdown} style={{ padding: "8px 12px", borderRadius: 6, border: "none", background: "#2563eb", color: "white" }}>Download Markdown</button>
+            <button onClick={downloadJSON} style={{ padding: "8px 12px", borderRadius: 6, border: "none", background: "#06b6d4", color: "white" }}>Download JSON</button>
+            <button onClick={downloadCSV} style={{ padding: "8px 12px", borderRadius: 6, border: "none", background: "#374151", color: "white" }}>Download CSV</button>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 12, display: "flex", gap: 8, justifyContent: "center", paddingBottom: 24 }}>
+          <button onClick={() => router.push("/compare/software")} style={{ padding: "10px 14px", borderRadius: 6, border: "none", background: "linear-gradient(90deg,#2563eb,#06b6d4)", color: "white" }}>New Comparison</button>
+          <button onClick={() => router.push("/")} style={{ padding: "10px 14px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.06)", background: "transparent", color: "#e6eef8" }}>Home</button>
+        </div>
+      </main>
+    </div>
+  )
+}
                 <p className="text-sm text-slate-400 mb-3">
                   Skip re-testing {(stats.unchanged_percentage || 0).toFixed(1)}% of unchanged code. This saves
                   approximately{" "}
