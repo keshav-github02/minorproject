@@ -1,9 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Upload, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function PDFComparePage() {
@@ -49,122 +46,107 @@ export default function PDFComparePage() {
     }
   }
 
+  const containerStyle: React.CSSProperties = {
+    minHeight: "100vh",
+    background: "linear-gradient(180deg,#0f1724,#111827)",
+    color: "#e6eef8",
+    paddingBottom: 48,
+  }
+
+  const headerStyle: React.CSSProperties = { padding: "28px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }
+  const mainStyle: React.CSSProperties = { maxWidth: 900, margin: "24px auto", padding: "0 16px" }
+  const cardStyle: React.CSSProperties = {
+    background: "rgba(17,24,39,0.6)",
+    border: "1px solid rgba(255,255,255,0.04)",
+    padding: 24,
+    borderRadius: 8,
+    textAlign: "center",
+  }
+  const btnPrimary: React.CSSProperties = {
+    display: "inline-block",
+    padding: "12px 20px",
+    background: "linear-gradient(90deg,#2563eb,#06b6d4)",
+    color: "white",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
+    fontSize: 16,
+  }
+  const btnOutline: React.CSSProperties = {
+    display: "inline-block",
+    padding: "10px 16px",
+    background: "transparent",
+    color: "#e6eef8",
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 6,
+    cursor: "pointer",
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur">
-        <div className="mx-auto max-w-4xl px-6 py-6">
-          <button
-            onClick={() => router.push("/")}
-            className="mb-4 text-sm text-slate-400 hover:text-white transition-colors"
-          >
+    <div style={containerStyle}>
+      <header style={headerStyle}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#cbd5e1", cursor: "pointer", marginBottom: 8 }}>
             ← Back to Home
           </button>
-          <h1 className="text-3xl font-bold text-white">PDF Comparison</h1>
-          <p className="mt-2 text-slate-400">Upload two PDF documents to compare their content</p>
+          <h1 style={{ margin: 0, fontSize: 28 }}>PDF Comparison</h1>
+          <p style={{ marginTop: 6, color: "#9aa7b8" }}>Upload two PDF documents to compare their content</p>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-          {/* File 1 Upload */}
-          <Card className="bg-slate-800/50 border-slate-700 p-10">
-            <div className="text-center">
-              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400">
-                <Upload className="h-8 w-8" />
+      <main style={mainStyle}>
+        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", marginBottom: 20 }}>
+          <div style={{ ...cardStyle, flex: 1, minWidth: 260 }}>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ height: 56, width: 56, borderRadius: 8, margin: "0 auto 8px", background: "rgba(59,130,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#60a5fa" }}>PDF</div>
+              <h3 style={{ margin: "8px 0" }}>First PDF</h3>
+              <p style={{ color: "#9aa7b8" }}>{file1 ? file1.name : "Upload the first PDF file to compare"}</p>
+              <input id="file1-input" type="file" accept=".pdf" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], true)} style={{ display: "none" }} />
+              <div style={{ marginTop: 12 }}>
+                <button onClick={() => (document.getElementById("file1-input") as HTMLInputElement | null)?.click()} style={btnOutline}>
+                  Choose File
+                </button>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">First PDF</h3>
-              <p className="text-sm text-slate-400 mb-6">
-                {file1 ? `${file1.name}` : "Upload the first PDF file to compare"}
-              </p>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], true)}
-                className="hidden"
-                id="file1-input"
-              />
-              <Button
-                onClick={() => document.getElementById("file1-input")?.click()}
-                variant="outline"
-                className="w-full border-slate-600 hover:border-blue-500 text-white"
-              >
-                Choose File
-              </Button>
-              {file1 && <div className="mt-4 p-3 bg-blue-500/10 rounded-lg text-blue-400 text-sm">✓ Ready</div>}
+              {file1 && <div style={{ marginTop: 12, padding: 8, borderRadius: 6, color: "#60a5fa", background: "rgba(96,165,250,0.06)" }}>✓ Ready</div>}
             </div>
-          </Card>
+          </div>
 
-          {/* File 2 Upload */}
-          <Card className="bg-slate-800/50 border-slate-700 p-10">
-            <div className="text-center">
-              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
-                <Upload className="h-8 w-8" />
+          <div style={{ ...cardStyle, flex: 1, minWidth: 260 }}>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ height: 56, width: 56, borderRadius: 8, margin: "0 auto 8px", background: "rgba(6,182,212,0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "#67e8f9" }}>PDF</div>
+              <h3 style={{ margin: "8px 0" }}>Second PDF</h3>
+              <p style={{ color: "#9aa7b8" }}>{file2 ? file2.name : "Upload the second PDF file to compare"}</p>
+              <input id="file2-input" type="file" accept=".pdf" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], false)} style={{ display: "none" }} />
+              <div style={{ marginTop: 12 }}>
+                <button onClick={() => (document.getElementById("file2-input") as HTMLInputElement | null)?.click()} style={btnOutline}>
+                  Choose File
+                </button>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Second PDF</h3>
-              <p className="text-sm text-slate-400 mb-6">
-                {file2 ? `${file2.name}` : "Upload the second PDF file to compare"}
-              </p>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], false)}
-                className="hidden"
-                id="file2-input"
-              />
-              <Button
-                onClick={() => document.getElementById("file2-input")?.click()}
-                variant="outline"
-                className="w-full border-slate-600 hover:border-cyan-500 text-white"
-              >
-                Choose File
-              </Button>
-              {file2 && <div className="mt-4 p-3 bg-cyan-500/10 rounded-lg text-cyan-400 text-sm">✓ Ready</div>}
+              {file2 && <div style={{ marginTop: 12, padding: 8, borderRadius: 6, color: "#67e8f9", background: "rgba(103,232,249,0.04)" }}>✓ Ready</div>}
             </div>
-          </Card>
+          </div>
         </div>
 
-        {/* Compare Button */}
-        <div className="flex justify-center mb-20">
-          <Button
-            onClick={handleCompare}
-            disabled={!file1 || !file2 || loading}
-            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-6 text-lg"
-          >
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <button onClick={handleCompare} disabled={!file1 || !file2 || loading} style={{ ...btnPrimary, opacity: !file1 || !file2 || loading ? 0.6 : 1 }}>
             {loading ? (
               <>
-                <span className="inline-block animate-spin mr-2">⚙</span>
+                <span style={{ marginRight: 8 }}>⚙</span>
                 Comparing...
               </>
             ) : (
-              <>
-                Compare PDFs
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </>
+              "Compare PDFs"
             )}
-          </Button>
+          </button>
         </div>
 
-        {/* Info Section */}
-        <div className="mt-24 bg-slate-800/30 border border-slate-700 rounded-lg p-10">
-          <h3 className="text-lg font-semibold text-white mb-4">How it works</h3>
-          <ul className="space-y-3 text-slate-400">
-            <li className="flex gap-3">
-              <span className="text-blue-400 font-bold">1.</span>
-              <span>Upload two PDF files you want to compare</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="text-blue-400 font-bold">2.</span>
-              <span>Our system extracts and analyzes the text content</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="text-blue-400 font-bold">3.</span>
-              <span>Get detailed comparison metrics and similarity scores</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="text-blue-400 font-bold">4.</span>
-              <span>View side-by-side differences and generate reports</span>
-            </li>
+        <div style={{ ...cardStyle }}>
+          <h3 style={{ marginTop: 0 }}>How it works</h3>
+          <ul style={{ color: "#9aa7b8", paddingLeft: 18 }}>
+            <li style={{ margin: "8px 0" }}><strong style={{ color: "#c7e3ff" }}>1.</strong> Upload two PDF files you want to compare</li>
+            <li style={{ margin: "8px 0" }}><strong style={{ color: "#c7e3ff" }}>2.</strong> Our system extracts and analyzes the text content</li>
+            <li style={{ margin: "8px 0" }}><strong style={{ color: "#c7e3ff" }}>3.</strong> Get detailed comparison metrics and similarity scores</li>
+            <li style={{ margin: "8px 0" }}><strong style={{ color: "#c7e3ff" }}>4.</strong> View side-by-side differences and generate reports</li>
           </ul>
         </div>
       </main>

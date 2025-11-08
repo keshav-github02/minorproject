@@ -1,9 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Upload, ArrowRight, Code } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function SoftwareComparePage() {
@@ -11,7 +8,6 @@ export default function SoftwareComparePage() {
   const [file1, setFile1] = useState<File | null>(null)
   const [file2, setFile2] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
-  const [useDemo, setUseDemo] = useState(false)
   const router = useRouter()
 
   const handleCompareDemo = async () => {
@@ -68,167 +64,88 @@ export default function SoftwareComparePage() {
     }
   }
 
+  const container: React.CSSProperties = { minHeight: "100vh", background: "linear-gradient(180deg,#0f1724,#111827)", color: "#e6eef8" }
+  const header: React.CSSProperties = { padding: 28, borderBottom: "1px solid rgba(255,255,255,0.06)" }
+  const mainStyle: React.CSSProperties = { maxWidth: 900, margin: "0 auto", padding: "24px 16px" }
+  const card: React.CSSProperties = { background: "rgba(17,24,39,0.6)", borderRadius: 8, padding: 20, border: "1px solid rgba(255,255,255,0.04)" }
+  const btn: React.CSSProperties = { padding: "10px 14px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)", background: "transparent", color: "#e6eef8", cursor: "pointer" }
+  const btnPrimary: React.CSSProperties = { padding: "12px 18px", borderRadius: 8, border: "none", background: "linear-gradient(90deg,#2563eb,#06b6d4)", color: "white", cursor: "pointer" }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur">
-        <div className="mx-auto max-w-4xl px-6 py-6">
-          <button
-            onClick={() => router.push("/")}
-            className="mb-4 text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            ← Back to Home
-          </button>
-          <h1 className="text-3xl font-bold text-white">Software Version Comparison</h1>
-          <p className="mt-2 text-slate-400">Compare two versions of software and analyze changes</p>
+    <div style={container}>
+      <header style={header}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <button onClick={() => router.push("/") } style={{ background: "none", border: "none", color: "#cbd5e1", cursor: "pointer", marginBottom: 8 }}>← Back to Home</button>
+          <h1 style={{ margin: 0, fontSize: 28 }}>Software Version Comparison</h1>
+          <p style={{ color: "#9aa7b8", marginTop: 6 }}>Compare two versions of software and analyze changes</p>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <main style={mainStyle}>
         {step === "method" ? (
           <>
-            <div className="text-center mb-16">
-              <h2 className="text-2xl font-bold text-white mb-4">How would you like to compare?</h2>
-              <p className="text-slate-400 text-lg">Choose between using demo versions or uploading your own</p>
+            <div style={{ textAlign: "center", marginBottom: 24 }}>
+              <h2 style={{ margin: 0, fontSize: 22 }}>How would you like to compare?</h2>
+              <p style={{ color: "#9aa7b8" }}>Choose between using demo versions or uploading your own</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-              {/* Demo Option */}
-              <Card
-                className="group cursor-pointer bg-slate-800/50 border-slate-700 hover:border-cyan-500/50 transition-all duration-300 overflow-hidden"
-                onClick={() => {
-                  setUseDemo(true)
-                  handleCompareDemo()
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative p-8">
-                  <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
-                    <Code className="h-7 w-7" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3">Try Demo Versions</h3>
-                  <p className="text-slate-400 mb-6">
-                    Compare our built-in demo versions (v1.0 vs v2.0) to see how the tool works
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-500">Instant demo</span>
-                    <ArrowRight className="h-5 w-5 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
+              <div style={{ ...card, flex: 1, minWidth: 260, cursor: "pointer" }} onClick={() => { handleCompareDemo(); }}>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ height: 56, width: 56, borderRadius: 10, background: "rgba(6,182,212,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#67e8f9" }}>Demo</div>
+                  <h3 style={{ margin: 0 }}>Try Demo Versions</h3>
+                  <p style={{ color: "#9aa7b8" }}>Compare our built-in demo versions (v1.0 vs v2.0)</p>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                    <span style={{ color: "#9aa7b8", fontSize: 13 }}>Instant demo</span>
+                    <span style={{ color: "#67e8f9" }}>→</span>
                   </div>
                 </div>
-              </Card>
-
-              {/* Upload Option */}
-              <Card
-                className="group cursor-pointer bg-slate-800/50 border-slate-700 hover:border-blue-500/50 transition-all duration-300 overflow-hidden"
-                onClick={() => setStep("upload")}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative p-8">
-                  <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400">
-                    <Upload className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3">Upload Your Versions</h3>
-                  <p className="text-slate-400 mb-6">Upload two versions of your own software as ZIP files</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-500">Custom versions</span>
-                    <ArrowRight className="h-5 w-5 text-blue-400 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {loading && (
-              <div className="text-center text-slate-400">
-                <span className="inline-block animate-spin mr-2">⚙</span>
-                Preparing demo comparison...
               </div>
-            )}
+
+              <div style={{ ...card, flex: 1, minWidth: 260, cursor: "pointer" }} onClick={() => setStep("upload")}>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ height: 56, width: 56, borderRadius: 10, background: "rgba(59,130,246,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", color: "#60a5fa" }}>ZIP</div>
+                  <h3 style={{ margin: 0 }}>Upload Your Versions</h3>
+                  <p style={{ color: "#9aa7b8" }}>Upload two versions of your own software as ZIP files</p>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                    <span style={{ color: "#9aa7b8", fontSize: 13 }}>Custom versions</span>
+                    <span style={{ color: "#60a5fa" }}>→</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {loading && <div style={{ textAlign: "center", color: "#9aa7b8" }}>⚙ Preparing demo comparison...</div>}
           </>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-              {/* File 1 Upload */}
-              <Card className="bg-slate-800/50 border-slate-700 p-8">
-                <div className="text-center">
-                  <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400">
-                    <Upload className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Version 1.0</h3>
-                  <p className="text-sm text-slate-400 mb-6">
-                    {file1 ? `${file1.name}` : "Upload the first version (ZIP file)"}
-                  </p>
-                  <input
-                    type="file"
-                    accept=".zip"
-                    onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], true)}
-                    className="hidden"
-                    id="file1-input"
-                  />
-                  <Button
-                    onClick={() => document.getElementById("file1-input")?.click()}
-                    variant="outline"
-                    className="w-full border-slate-600 hover:border-blue-500 text-white"
-                  >
-                    Choose File
-                  </Button>
-                  {file1 && <div className="mt-4 p-3 bg-blue-500/10 rounded-lg text-blue-400 text-sm">✓ Ready</div>}
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
+              <div style={{ ...card, flex: 1, minWidth: 260 }}>
+                <h3>Version 1.0</h3>
+                <p style={{ color: "#9aa7b8" }}>{file1 ? file1.name : "Upload the first version (ZIP file)"}</p>
+                <input id="file1-input" type="file" accept=".zip" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], true)} style={{ display: "none" }} />
+                <div style={{ marginTop: 10 }}>
+                  <button style={btn} onClick={() => (document.getElementById("file1-input") as HTMLInputElement | null)?.click()}>Choose File</button>
                 </div>
-              </Card>
+                {file1 && <div style={{ marginTop: 10, color: "#60a5fa" }}>✓ Ready</div>}
+              </div>
 
-              {/* File 2 Upload */}
-              <Card className="bg-slate-800/50 border-slate-700 p-8">
-                <div className="text-center">
-                  <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
-                    <Upload className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Version 2.0</h3>
-                  <p className="text-sm text-slate-400 mb-6">
-                    {file2 ? `${file2.name}` : "Upload the second version (ZIP file)"}
-                  </p>
-                  <input
-                    type="file"
-                    accept=".zip"
-                    onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], false)}
-                    className="hidden"
-                    id="file2-input"
-                  />
-                  <Button
-                    onClick={() => document.getElementById("file2-input")?.click()}
-                    variant="outline"
-                    className="w-full border-slate-600 hover:border-cyan-500 text-white"
-                  >
-                    Choose File
-                  </Button>
-                  {file2 && <div className="mt-4 p-3 bg-cyan-500/10 rounded-lg text-cyan-400 text-sm">✓ Ready</div>}
+              <div style={{ ...card, flex: 1, minWidth: 260 }}>
+                <h3>Version 2.0</h3>
+                <p style={{ color: "#9aa7b8" }}>{file2 ? file2.name : "Upload the second version (ZIP file)"}</p>
+                <input id="file2-input" type="file" accept=".zip" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], false)} style={{ display: "none" }} />
+                <div style={{ marginTop: 10 }}>
+                  <button style={btn} onClick={() => (document.getElementById("file2-input") as HTMLInputElement | null)?.click()}>Choose File</button>
                 </div>
-              </Card>
+                {file2 && <div style={{ marginTop: 10, color: "#67e8f9" }}>✓ Ready</div>}
+              </div>
             </div>
 
-            <div className="flex gap-4 justify-center">
-              <Button
-                onClick={() => setStep("method")}
-                variant="outline"
-                className="border-slate-600 hover:border-slate-500 text-white"
-              >
-                Back
-              </Button>
-              <Button
-                onClick={handleCompareUpload}
-                disabled={!file1 || !file2 || loading}
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-6 text-lg"
-              >
-                {loading ? (
-                  <>
-                    <span className="inline-block animate-spin mr-2">⚙</span>
-                    Comparing...
-                  </>
-                ) : (
-                  <>
-                    Compare Versions
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </>
-                )}
-              </Button>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              <button style={{ ...btn, background: "transparent" }} onClick={() => setStep("method")}>Back</button>
+              <button style={{ ...btnPrimary, opacity: !file1 || !file2 || loading ? 0.6 : 1 }} onClick={handleCompareUpload} disabled={!file1 || !file2 || loading}>
+                {loading ? "⚙ Comparing..." : "Compare Versions"}
+              </button>
             </div>
           </>
         )}
